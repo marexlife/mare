@@ -13,7 +13,6 @@ import token;
 
 export module lexer;
 
-
 namespace mare::lex {
 export class Lexer {
    public:
@@ -66,7 +65,7 @@ export class Lexer {
             return std::nullopt;
         }
 
-        return source_code_[std::exchange(index_, index_ + 1)];
+        return source_code_.at(std::exchange(index_, index_ + 1));
     }
 
     [[nodiscard]] std::optional<char> peak() const {
@@ -74,7 +73,7 @@ export class Lexer {
             return std::nullopt;
         }
 
-        return source_code_[index_ + 1];
+        return source_code_.at(index_ + 1);
     }
 
     std::unordered_map<std::string_view, Token> token_mapping_;
