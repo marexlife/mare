@@ -24,35 +24,46 @@ export class Lexer {
             lex_iter(*current);
         }
 
+        flush();
+
         return tokens_;
     }
 
    private:
-    [[nodiscard]] Token translate(std::string_view current_word) {
-        if (token_mapping_.contains(current_word)) {
-            return token_mapping_.at(current_word);
+    [[nodiscard]] Token translate() {
+        if (token_mapping_.contains(current_word_)) {
+            return token_mapping_.at(current_word_);
         }
 
-        return Token{std::string(current_word),
+        return Token{std::string(current_word_),
                      TokenKind::Identifier};
     }
 
     void lex_iter(char current) {
-        if (auto token = special_token(current)) {
+        if (auto token = get_special_token(current)) {
+            flush();
+            tokens_.emplace_back(*token);
+
             return;
         }
 
         switch (current) {
             case ' ':
-
+                flush();
                 break;
             default:
-
+                current_word_.push_back(current);
                 break;
         }
     }
 
-    [[nodiscard]] std::optional<Token> special_token(char current) {
+    void flush() {
+        tokens_.emplace_back(translate());
+        current_word_.clear();
+    }
+
+    [[nodiscard]] std::optional<Token> get_special_token(
+        char current) {
         if (current == '=' and peak() == '=') {
             return std::optional(Token{TokenKind::Assignment});
         }
